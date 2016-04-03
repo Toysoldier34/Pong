@@ -1,0 +1,48 @@
+import flash.events.MouseEvent;
+
+var maxHP:int = 10000;
+var currentHP:int = maxHP;
+var percentHP:Number = currentHP / maxHP;
+var healing:int = 1;
+
+function updateHealthBar():void {
+	if(currentHP > maxHP){
+		currentHP = maxHP;
+	}
+	percentHP = currentHP / maxHP;
+	
+	healthBar.barColor.scaleX = percentHP;
+}
+
+attackButton.addEventListener(MouseEvent.CLICK, attackButtonClicked);
+
+function attackButtonClicked(e:MouseEvent):void {
+	currentHP -=  300;
+	if (currentHP <= 0) {
+		currentHP = 0;
+		trace("You died");
+	}
+}
+
+init();
+function init():void {
+	stage.addEventListener(Event.ENTER_FRAME, loop);
+}
+
+
+function loop(e:Event):void {
+	healing = 100 -(percentHP*100);
+	if (currentHP < maxHP) {
+		
+		currentHP +=  healing;
+		updateHealthBar();
+	}
+
+}
+
+
+
+
+
+
+
