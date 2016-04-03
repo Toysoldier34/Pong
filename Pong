@@ -1,0 +1,118 @@
+var ballSpeedX:int = -3;
+var ballSpeedY:int = -2;
+var cpuPaddleSpeed:int = 2;
+var playerScore:int = 0;
+var cpuScore:int = 0;
+ 
+init();
+ 
+function init():void
+{
+    stage.addEventListener(Event.ENTER_FRAME, loop);
+}
+ 
+function loop(e:Event):void  //main loop
+{
+	
+	//collision detection
+	
+	if(playerPaddle.hitTestObject(ball) == true){
+		if(ballSpeedX < 0){
+			ballSpeedX *= -1;
+			ballSpeedY = calculateBallAngle(playerPaddle.y, ball.y);
+		}
+	}else if(cpuPaddle.hitTestObject(ball) == true){
+		if(ballSpeedX > 0){
+			ballSpeedX *= -1;
+			ballSpeedY = calculateBallAngle(cpuPaddle.y, ball.y); 
+		}
+	}
+	
+	
+	
+	
+	
+	
+    ball.x += ballSpeedX;
+    ball.y += ballSpeedY;
+ 
+    //because the ball's position is measured by where its CENTER is...
+    //...we need add or subtract half of its width or height to see if that SIDE is hitting a wall
+ 
+    //first check the left and right boundaries
+    if(ball.x <= ball.width/2){ //check if the x position of the left side of the ball is less than or equal to the left side of the screen, which would be 0
+        ball.x = ball.width/2; //then set the ball's x position to that point, in case it already moved off the screen
+        ballSpeedX *= -1; //and multiply the ball's x speed by -1, which will make it move right instead of left
+		cpuScore++;
+		updateTextFields();
+ 
+    } else if(ball.x >= stage.stageWidth-ball.width/2){ //check to see the right side of the ball is touching the right boundary, which would be 550
+        ball.x = stage.stageWidth-ball.width/2; //reposition it, just in case
+        ballSpeedX *= -1; //multiply the x speed by -1 (now moving left, not right)
+		playerScore++; 
+		updateTextFields();
+ 
+    }
+ 
+    //now we do the same with the top and bottom of the screen
+    if(ball.y <= ball.height/2){ //if the y position of the top of the ball is less than or equal to the top of the screen
+        ball.y = ball.height/2; //like we did before, set it to that y position...
+        ballSpeedY *= -1; //...and reverse its y speed so that it is now going down instead of up
+ 
+    } else if(ball.y >= stage.stageHeight-ball.height/2){ //if the bottom of the ball is lower than the bottom of the screen
+        ball.y = stage.stageHeight-ball.height/2; //reposition it
+        ballSpeedY *= -1; //and reverse its y speed so that it is moving up now
+ 
+    }
+	
+	
+	//player paddle movement
+	
+	//check if top of paddle is above top of screen
+	playerPaddle.y = mouseY;
+	
+	if(playerPaddle.y - playerPaddle.height/2 < 0){
+		playerPaddle.y = playerPaddle.height/2;
+		
+	//check if bottom of paddle is below bottom of screen
+	} else if(playerPaddle.y + playerPaddle.height/2 > stage.stageHeight){
+		playerPaddle.y = stage.stageHeight - playerPaddle.height/2;
+	}
+	
+	
+	//cpu paddle logic
+	
+	if(cpuPaddle.y < ball.y - 10){
+		cpuPaddle.y += cpuPaddleSpeed;
+	} else if(cpuPaddle.y > ball.y + 10){
+		cpuPaddle.y -= cpuPaddleSpeed;
+	}
+}
+
+
+function calculateBallAngle(paddleY:Number, ballY:Number):Number
+{
+	var ySpeed:Number = 5 * ( (ballY-paddleY) / 25 );
+	// (ballY-paddleY) / 25 will be between -1 and 1 depending on where the ball hits
+	
+	return ySpeed;
+}
+
+
+function updateTextFields():void{
+	playerScoreText.text = ("Player Score: " + playerScore);
+	cpuScoreText.text = ("CPU Score: " + cpuScore);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
