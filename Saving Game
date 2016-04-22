@@ -1,0 +1,115 @@
+import flash.net.SharedObject;
+import flash.events.MouseEvent;
+
+var saveDataObject:SharedObject;
+var currentScore:int;
+
+init();
+
+function init():void{  // call once to set everything up
+	
+	saveDataObject = SharedObject.getLocal("test");  // give the save data a location
+	currentScore = 0;  //start with 0 score
+	
+	btnAdd.addEventListener(MouseEvent.CLICK, addScore);  // clicking on +1
+	btnSave.addEventListener(MouseEvent.CLICK, saveData);  // clicking on Save
+	
+	if(saveDataObject.data.savedScore == null){  // checks if there is save data
+		trace("No saved data yet."); 
+		saveDataObject.data.savedScore = currentScore;  // if there isn't any data on the computer set the savedScore to 0
+	}else{
+		trace("Save data found.");  // if we did find data
+		loadData();  // ...load the data
+	}
+	
+	updateScoreText(); // finally, update the text field
+	
+}
+
+
+function addScore(e:MouseEvent):void{
+	currentScore += 1;  // add 1 to the score
+	trace("currentScore: " + currentScore);
+	updateScoreText();  // update the textfield
+}
+
+function saveData(e:MouseEvent):void{
+	saveDataObject.data.savedScore = currentScore;  // set the saved score to the current score
+	trace("Data saved");
+	saveDataObject.flush();  // immediately save to the local drive
+	trace(saveDataObject.size);  // this will show the size of the save file, in bytes
+}
+
+function loadData():void{
+	currentScore = saveDataObject.data.savedScore;  // set the current score to the saved score
+	trace("Data Loaded");
+}
+
+function updateScoreText():void{
+	txtScore.text = ("Score: " + currentScore); // set the text property of the txtScore
+	trace("Score text updated");
+}
+
+
+
+
+
+
+
+/*
+Do you mean you want the player’s progress to be saved (which levels they have completed and which one they are currently up to)?
+
+You could just create a new “variable” in the sharedObject, and set it to the currentLevel:
+saveDataObject.data.currentLevel = currentLevel;
+
+Then when you start the game, instead of setting the level to 1, when you start the game set currentLevel = saveDataObject.data.currentLevel, and then run through a series of if/else conditionals to go to the appropriate level.
+if(currentLevel == 1){
+gotoLevel1();
+} else if(currentLevel == 2){
+gotoLevel2();
+
+} else if… etc
+
+
+Yeah, that makes sense. I haven’t tested this myself but I’m pretty sure you could do the following: create an array for the levels that are unlocked.
+
+var unlockedLevels:Array = [1]; //right now only level 1 is unlocked
+
+When you complete a level:
+unlockedLevels.push(currentLevel+1); //unlocks the next level
+
+When you are in the menu screen, check if a level is unlocked by checking if its number is the array:
+if(unlockedLevels.indexOf(thisLevelNumber) < 0){ //thisLevelNumber isn't in the array
+//lower the alpha of this level select button
+} else {
+//the level is unlocked, so show this button completely
+}
+
+Then for saving and loading, just proceed like you would for any variable.
+
+Saving:
+saveDataObject.data.unlockedLevels = unlockedLevels;
+
+Loading:
+unlockedLevels = saveDataObject.data.unlockedLevels;
+
+Hopefully this works. Good luck with your project! Let me know how it goes :-)
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
